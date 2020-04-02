@@ -7,8 +7,9 @@ class data:
         self.theta=theta
         self.phi=phi
         self.value=value
-
-def get_data(): #data_type: 0-S11, 1-S21
+        
+#theta set to 90 degrees, 10 total frequencies: 1 GHz, 1.1 GHz...1.9 GHz 
+def get_data(): 
     temp_dataset = []
     for i in range(0, 360):
         temp_dataset.append(data('S21', 1000000000, 90, i, round(-30-abs(i-180)/6,4)))
