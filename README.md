@@ -1,20 +1,12 @@
-vna_comms v1.0.1
+vna_comms v1.0.2
 
 Changelog:
 
+-Incorporated averaging capabilities into the setup function. Averaging factor is now an new argument for setup()
 
--Markers have been removed from measurement process. They are not necessary.
+-Completed calibration function. Wording of calibration prompts may need to be improved.
 
--Fixed dropped connections issue in get_S21() and get_S11()
-
--linear frequency mode is now functional. Set sweep type to 0 for linear frequency.
-
-
-To-do:
-
--need to incorporate averaging capabilities into the setup function
-
--calibration function
+-Added a dummy output generator sample_output.py. Calling the get_data() functions (no args required) will automatically return a dataset with 3600 data points (10 frequencies, 1 degree increments)
 
 -------------------------------------------------------------------------------------------------------------------------------------
 Packages used for testing:
