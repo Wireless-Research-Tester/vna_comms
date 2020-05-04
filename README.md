@@ -1,4 +1,15 @@
 # Changelog
+### v1.2.0 
+
+- All vna_comms functions are now part of the same *session* class. No need to repeatedly open and close pyvisa resources and pass redundant data to the functions.
+  - To open a new session, call vna_comms.session(Resource) where **Resource** is the resource name for the vna found in list_resources in pyvisa
+- Changed data from recording magnitude (dB) only to magnitude (dB) and phase (degrees)
+  - This also changes the **data** class structure
+  - New function phase() is used to compute the phase from the rectangular form received from the VNA. 
+- Removed the **sweep_type** argument from setup() and get_data(). Now the functions will look at the data type for frequency to determine what kind of sweep is appropriate.
+- In get_data(), argument **data_type** will be in a string format (i.e. 'S21' or 'S11') instead of 0 and 1. This improves readability of the code.
+- **New file**: testbench.py
+  - simple script to test vna_comms
 
 ### v1.1.0
 
@@ -45,4 +56,3 @@ Packages used for testing:
 - NI 488.2: 19.5 (64-bit) (https://www.ni.com/en-us/support/downloads/drivers/download.ni-488-2.html#329025)
 - Python: 3.8.2 (64-bit)
 - PyVISA: 1.10.1 (https://pyvisa.readthedocs.io/en/latest/)
-- numpy: 1.18.2
