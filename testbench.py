@@ -11,4 +11,7 @@ sess.calibrate()
 time.sleep(1)
 temp = sess.get_data(90, 75, 'S21')
 for i in range(0, len(temp)):
-    print("Measurement Type: {}, Frequency: {} MHz, Magnitude: {} dB, Phase: {} degrees".format(temp[i].measurement_type, temp[i].freq, temp[i].value_mag, temp[i].value_phase))
+    print("Measurement Type: {}, Frequency: {} MHz, Magnitude: {} dB, Phase: {} degrees".format(temp[i].measurement_type
+                                                                                                , temp[i].freq,
+                                                                                                temp[i].value_mag,
+                                                                                                temp[i].value_phase))

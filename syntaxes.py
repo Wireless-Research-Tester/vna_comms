@@ -37,55 +37,79 @@ def check_model(string):
     if '8753D' in string:
         return Model.HP_8753D
     else:
-        return 0
+        raise Exception('Model is either not supported, or model is not found in query message: {}'.format(string))
 
 
 def find_command(model, action, arg=0):
-    commands = {
-        Action.RESET: RESET(model),
-        Action.FORM4: FORM4(model),
-        Action.ADD_LIST_FREQ: ADD_LIST_FREQ(model, arg),
-        Action.LIST_FREQ_MODE: LIST_FREQ_MODE(model),
-        Action.LIN_FREQ_START: LIN_FREQ_START(model, arg),
-        Action.LIN_FREQ_END: LIN_FREQ_END(model, arg),
-        Action.LIN_FREQ_POINTS: LIN_FREQ_POINTS(model, arg),
-        Action.LIN_FREQ_MODE: LIN_FREQ_MODE(model),
-        Action.AVG_FACTOR: AVG_FACTOR(model, arg),
-        Action.AVG_ON: AVG_ON(model),
-        Action.AVG_RESET: AVG_RESET(model),
-        Action.IF_BW: IF_BW(model, arg),
-        Action.S21: S21(model),
-        Action.S11: S11(model),
-        Action.POLAR: POLAR(model),
-        Action.POLAR_LOG_MARKER: POLAR_LOG_MARKER(model),
-        Action.AUTO_SCALE: AUTO_SCALE(model),
-        Action.DATA_TO_MEM: DATA_TO_MEM(model),
-        Action.DISPLAY_MEM: DISPLAY_MEM(model),
-        Action.OUTPUT_FORMATTED_DATA: OUTPUT_FORMATTED_DATA(model),
-        Action.CAL_S11_1_PORT: CAL_S11_1_PORT(model),
-        Action.CAL_S11_1_PORT_OPEN: CAL_S11_1_PORT_OPEN(model),
-        Action.CAL_S11_1_PORT_SHORT: CAL_S11_1_PORT_SHORT(model),
-        Action.CAL_S11_1_PORT_LOAD: CAL_S11_1_PORT_LOAD(model),
-        Action.SAVE_1_PORT_CAL: SAVE_1_PORT_CAL(model),
-    }
-    return commands.get(action)
+    if action == Action.RESET:
+        return reset(model)
+    elif action == Action.FORM4:
+        return form4(model)
+    elif action == Action.ADD_LIST_FREQ:
+        return add_list_freq(model, arg)
+    elif action == Action.LIST_FREQ_MODE:
+        return list_freq_mode(model)
+    elif action == Action.LIN_FREQ_START:
+        return lin_freq_start(model, arg)
+    elif action == Action.LIN_FREQ_END:
+        return lin_freq_end(model, arg)
+    elif action == Action.LIN_FREQ_POINTS:
+        return lin_freq_points(model, arg)
+    elif action == Action.LIN_FREQ_MODE:
+        return lin_freq_mode(model)
+    elif action == Action.AVG_FACTOR:
+        return avg_factor(model, arg)
+    elif action == Action.AVG_ON:
+        return avg_on(model)
+    elif action == Action.AVG_RESET:
+        return avg_reset(model)
+    elif action == Action.IF_BW:
+        return if_bw(model, arg)
+    elif action == Action.S21:
+        return s21(model)
+    elif action == Action.S11:
+        return s11(model)
+    elif action == Action.POLAR:
+        return polar(model)
+    elif action == Action.POLAR_LOG_MARKER:
+        return polar_log_marker(model)
+    elif action == Action.AUTO_SCALE:
+        return auto_scale(model)
+    elif action == Action.DATA_TO_MEM:
+        return data_to_mem(model)
+    elif action == Action.DISPLAY_MEM:
+        return display_mem(model)
+    elif action == Action.OUTPUT_FORMATTED_DATA:
+        return output_formatted_data(model)
+    elif action == Action.CAL_S11_1_PORT:
+        return cal_s11_1_port(model)
+    elif action == Action.CAL_S11_1_PORT_OPEN:
+        return cal_s11_1_port_open(model)
+    elif action == Action.CAL_S11_1_PORT_SHORT:
+        return cal_s11_1_port_short(model)
+    elif action == Action.CAL_S11_1_PORT_LOAD:
+        return cal_s11_1_port_load(model)
+    elif action == Action.SAVE_1_PORT_CAL:
+        return save_1_port_cal(model)
+    else:
+        raise Exception('Invalid action, find_command() does the recognize the action: {}'.format(action))
 
 
-def RESET(model):
+def reset(model):
     commands = {
         Model.HP_8753D: 'PRES',
     }
     return commands.get(model)
 
 
-def FORM4(model):
+def form4(model):
     commands = {
         Model.HP_8753D: 'FORM4',
     }
     return commands.get(model)
 
 
-def ADD_LIST_FREQ(model, arg):
+def add_list_freq(model, arg):
     argument_valid = {
         Model.HP_8753D: arg * 10 ** 6 in range(30000, 6 * 10 ** 9),
     }
@@ -93,20 +117,20 @@ def ADD_LIST_FREQ(model, arg):
     commands = {
         Model.HP_8753D: 'EDITLIST; SADD; CENT %d MHZ; SDON' % arg,
     }
-    if (argument_valid.get(model)):
+    if argument_valid.get(model):
         return commands.get(model)
     else:
-        return 0
+        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg))
 
 
-def LIST_FREQ_MODE(model):
+def list_freq_mode(model):
     commands = {
         Model.HP_8753D: 'LISFREQ',
     }
     return commands.get(model)
 
 
-def LIN_FREQ_START(model, arg):
+def lin_freq_start(model, arg):
     argument_valid = {
         Model.HP_8753D: arg * 10 ** 6 in range(30000, 6 * 10 ** 9),
     }
@@ -114,13 +138,13 @@ def LIN_FREQ_START(model, arg):
     commands = {
         Model.HP_8753D: 'STAR %d MHZ' % arg,
     }
-    if (argument_valid.get(model)):
+    if argument_valid.get(model):
         return commands.get(model)
     else:
-        return 0
+        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg))
 
 
-def LIN_FREQ_END(model, arg):
+def lin_freq_end(model, arg):
     argument_valid = {
         Model.HP_8753D: arg * 10 ** 6 in range(30000, 6 * 10 ** 9),
     }
@@ -128,13 +152,13 @@ def LIN_FREQ_END(model, arg):
     commands = {
         Model.HP_8753D: 'STOP %d MHZ' % arg,
     }
-    if (argument_valid.get(model)):
+    if argument_valid.get(model):
         return commands.get(model)
     else:
-        return 0
+        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg))
 
 
-def LIN_FREQ_POINTS(model, arg):
+def lin_freq_points(model, arg):
     argument_valid = {
         Model.HP_8753D: arg in range(1, 1633),
     }
@@ -145,17 +169,17 @@ def LIN_FREQ_POINTS(model, arg):
     if argument_valid.get(model):
         return commands.get(model)
     else:
-        return 0
+        raise Exception('The number of points for the linear frequency sweep is invalid: {}'.format(arg))
 
 
-def LIN_FREQ_MODE(model):
+def lin_freq_mode(model):
     commands = {
         Model.HP_8753D: 'LINFREQ',
     }
     return commands.get(model)
 
 
-def AVG_FACTOR(model, arg):
+def avg_factor(model, arg):
     argument_valid = {
         Model.HP_8753D: arg in range(1, 1000),
     }
@@ -163,125 +187,125 @@ def AVG_FACTOR(model, arg):
     commands = {
         Model.HP_8753D: 'AVERFACT %d' % arg,
     }
-    if (argument_valid.get(model)):
+    if argument_valid.get(model):
         return commands.get(model)
     else:
-        return 0
+        raise Exception('The averaging factor is invalid: {}'.format(arg))
 
 
-def AVG_ON(model):
+def avg_on(model):
     commands = {
         Model.HP_8753D: 'AVERO1',
     }
     return commands.get(model)
 
 
-def AVG_RESET(model):
+def avg_reset(model):
     commands = {
         Model.HP_8753D: 'AVERREST',
     }
     return commands.get(model)
 
 
-def IF_BW(model, arg):
+def if_bw(model, arg):
     argument_valid = {
         Model.HP_8753D: arg == 10 or arg == 30 or arg == 100 or arg == 300 or arg == 1000 or arg == 3000 or arg == 3700,
     }
 
     commands = {
-        Model.HP_8753D: 'IFBW %d' % arg,
+        Model.HP_8753D: 'IFBW %d HZ' % arg,
     }
     if argument_valid.get(model):
         return commands.get(model)
     else:
-        return 0
+        raise Exception('The IF bandwidth value is invalid: {} Hz'.format(arg))
 
 
-def S21(model):
+def s21(model):
     commands = {
         Model.HP_8753D: 'S21',
     }
     return commands.get(model)
 
 
-def S11(model):
+def s11(model):
     commands = {
         Model.HP_8753D: 'S11',
     }
     return commands.get(model)
 
 
-def POLAR(model):
+def polar(model):
     commands = {
         Model.HP_8753D: 'POLA'
     }
     return commands.get(model)
 
 
-def POLAR_LOG_MARKER(model):
+def polar_log_marker(model):
     commands = {
         Model.HP_8753D: 'POLMLOG'
     }
     return commands.get(model)
 
 
-def AUTO_SCALE(model):
+def auto_scale(model):
     commands = {
         Model.HP_8753D: 'AUTO',
     }
     return commands.get(model)
 
 
-def DATA_TO_MEM(model):
+def data_to_mem(model):
     commands = {
         Model.HP_8753D: 'DATI',
     }
     return commands.get(model)
 
 
-def DISPLAY_MEM(model):
+def display_mem(model):
     commands = {
         Model.HP_8753D: 'DISPMEMO',
     }
     return commands.get(model)
 
 
-def OUTPUT_FORMATTED_DATA(model):
+def output_formatted_data(model):
     commands = {
         Model.HP_8753D: 'OUTPFORM',
     }
     return commands.get(model)
 
 
-def CAL_S11_1_PORT(model):
+def cal_s11_1_port(model):
     commands = {
         Model.HP_8753D: 'CALIS111',
     }
     return commands.get(model)
 
 
-def CAL_S11_1_PORT_OPEN(model):
+def cal_s11_1_port_open(model):
     commands = {
         Model.HP_8753D: 'CLASS11A',
     }
     return commands.get(model)
 
 
-def CAL_S11_1_PORT_SHORT(model):
+def cal_s11_1_port_short(model):
     commands = {
         Model.HP_8753D: 'CLASS11B',
     }
     return commands.get(model)
 
 
-def CAL_S11_1_PORT_LOAD(model):
+def cal_s11_1_port_load(model):
     commands = {
         Model.HP_8753D: 'CLASS11C',
     }
     return commands.get(model)
 
 
-def SAVE_1_PORT_CAL(model):
+def save_1_port_cal(model):
     commands = {
         Model.HP_8753D: 'SAV1',
     }

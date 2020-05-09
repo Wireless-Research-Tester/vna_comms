@@ -31,13 +31,13 @@ class session:
 
     def reset(self):
         self.vna.write(find_command(self.model, Action.RESET))
+        return 0
 
     def setup(self, freq, avg, bw):
         self.freq = freq
         if isinstance(self.freq, list):
             if len(self.freq) > 30:  # if sweep type is frequency list, only take a max of 30 frequencies
-                print('too many frequencies in frequency list!')
-                return 1
+                raise Exception('The number of frequencies in the frequency list exceeded 30.')
             for i in range(0, len(self.freq)):
                 freq_temp = self.freq[i]
                 self.vna.write(find_command(self.model, Action.ADD_LIST_FREQ, freq_temp))
@@ -54,7 +54,7 @@ class session:
         return 0
 
     def get_data(self, theta, phi, data_type):
-        temp_dataset = []
+        temp_data_set = []
         if data_type == 'S21':
             self.vna.write(find_command(self.model, Action.S21))
         else:
@@ -73,9 +73,9 @@ class session:
                     10)
                 phase_temp = phase(rectangular_temp)
                 if data_type == 'S21':
-                    temp_dataset.append(data('S21', self.freq[i], theta, phi, mag_temp, phase_temp))
+                    temp_data_set.append(data('S21', self.freq[i], theta, phi, mag_temp, phase_temp))
                 else:
-                    temp_dataset.append(data('S11', self.freq[i], theta, phi, mag_temp, phase_temp))
+                    temp_data_set.append(data('S11', self.freq[i], theta, phi, mag_temp, phase_temp))
         else:
             span = self.freq.end - self.freq.start
             for i in range(0, self.freq.points):
@@ -86,10 +86,10 @@ class session:
                     10)
                 phase_temp = phase(rectangular_temp)
                 if data_type == 1:
-                    temp_dataset.append(data('S21', freq, theta, phi, mag_temp, phase_temp))
+                    temp_data_set.append(data('S21', freq, theta, phi, mag_temp, phase_temp))
                 else:
-                    temp_dataset.append(data('S11', freq, theta, phi, mag_temp, phase_temp))
-        return temp_dataset
+                    temp_data_set.append(data('S11', freq, theta, phi, mag_temp, phase_temp))
+        return temp_data_set
 
     def calibrate(self):
         self.vna.write(find_command(self.model, Action.CAL_S11_1_PORT))
