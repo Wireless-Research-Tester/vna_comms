@@ -1,4 +1,9 @@
 # Changelog
+### v1.2.1
+
+- Added exception messages for returned errors
+- Fixed some typos in the code
+
 ### v1.2.0 
 
 - All vna_comms functions are now part of the same *session* class. No need to repeatedly open and close pyvisa resources and pass redundant data to the functions.
