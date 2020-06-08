@@ -1,4 +1,21 @@
 # Changelog
+### v1.2.2
+
+- Fixed an issue where dB conversion will return a math domain error
+- Changed certain GP-IB commands to use KHz instead of MHz as the unit to reduce execution times.
+  - For some reason, the VNA does not deal well with decimals. E.g. "STAR 10.5 MHZ" takes noticeably longer to process than "STAR 10500 KHZ"
+  - Input arguments to the functions are still in MHZ, so nothing has changed on the user's end
+- Added a reset averaging (rst_avg) function to be used in timing analysis testing. Once timing data is complete, this function will be merged with get_data()
+- Rearranged the execution order certain GP-IB commands to ensure that measurement parameters are actually being used during measurements (correction, sweep mode, sweep frequencies, etc.)
+- Performed timing analysis with avg_timing.py. Results can be found in vna_timing_results.csv
+  - The combinations tested were determined after discussion with Mike
+  - There are two times for each testing combination:
+    - averaging_complete_time is the time it takes the current averaging number to reach the averaging factor once an averaging reset is triggered
+    - get_data_complete_time is the time it takes to run get_data() once to completion.
+  - These numbers are the same whether or not correction is turned on
+  - Results contain the longest time observed and rounded up to the nearest millisecond
+    - Worth noting that the data type (S21 or S11) does not affect averaging time, and the averaging factor does not affect the get_data() completion time
+
 ### v1.2.1
 
 - Added exception messages for returned errors
