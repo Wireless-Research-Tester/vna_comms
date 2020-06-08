@@ -6,6 +6,7 @@ class Action(Enum):
     FORM4 = auto()
     ADD_LIST_FREQ = auto()
     LIST_FREQ_MODE = auto()
+    CLEAR_LIST = auto()
     LIN_FREQ_START = auto()
     LIN_FREQ_END = auto()
     LIN_FREQ_POINTS = auto()
@@ -27,6 +28,7 @@ class Action(Enum):
     CAL_S11_1_PORT_SHORT = auto()
     CAL_S11_1_PORT_LOAD = auto()
     SAVE_1_PORT_CAL = auto()
+    CORRECTION_ON = auto()
 
 
 class Model(Enum):
@@ -49,6 +51,8 @@ def find_command(model, action, arg=0):
         return add_list_freq(model, arg)
     elif action == Action.LIST_FREQ_MODE:
         return list_freq_mode(model)
+    elif action == Action.CLEAR_LIST:
+        return clear_list(model)
     elif action == Action.LIN_FREQ_START:
         return lin_freq_start(model, arg)
     elif action == Action.LIN_FREQ_END:
@@ -91,6 +95,8 @@ def find_command(model, action, arg=0):
         return cal_s11_1_port_load(model)
     elif action == Action.SAVE_1_PORT_CAL:
         return save_1_port_cal(model)
+    elif action == Action.CORRECTION_ON:
+        return correction_on(model)
     else:
         raise Exception('Invalid action, find_command() does the recognize the action: {}'.format(action))
 
@@ -111,11 +117,11 @@ def form4(model):
 
 def add_list_freq(model, arg):
     argument_valid = {
-        Model.HP_8753D: arg * 10 ** 6 in range(30000, 6 * 10 ** 9),
+        Model.HP_8753D: arg * 10 ** 3 in range(30000, 6 * 10 ** 9 + 1),
     }
 
     commands = {
-        Model.HP_8753D: 'EDITLIST; SADD; CENT %d MHZ; SDON' % arg,
+        Model.HP_8753D: 'EDITLIST; SADD; CENT {} KHZ; SDON'.format(arg),
     }
     if argument_valid.get(model):
         return commands.get(model)
@@ -130,32 +136,39 @@ def list_freq_mode(model):
     return commands.get(model)
 
 
+def clear_list(model):
+    commands = {
+        Model.HP_8753D: 'CLEL',
+    }
+    return commands.get(model)
+
+
 def lin_freq_start(model, arg):
     argument_valid = {
-        Model.HP_8753D: arg * 10 ** 6 in range(30000, 6 * 10 ** 9),
+        Model.HP_8753D: arg * 10 ** 3 in range(30000, 6 * 10 ** 9),
     }
 
     commands = {
-        Model.HP_8753D: 'STAR %d MHZ' % arg,
+        Model.HP_8753D: 'STAR {} KHZ'.format(arg),
     }
     if argument_valid.get(model):
         return commands.get(model)
     else:
-        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg))
+        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg / 1000))
 
 
 def lin_freq_end(model, arg):
     argument_valid = {
-        Model.HP_8753D: arg * 10 ** 6 in range(30000, 6 * 10 ** 9),
+        Model.HP_8753D: arg * 10 ** 3 in range(30000, 6 * 10 ** 9 + 1),
     }
 
     commands = {
-        Model.HP_8753D: 'STOP %d MHZ' % arg,
+        Model.HP_8753D: 'STOP {} KHZ'.format(arg),
     }
     if argument_valid.get(model):
         return commands.get(model)
     else:
-        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg))
+        raise Exception('The frequency is not in the valid range: {} MHz'.format(arg / 1000))
 
 
 def lin_freq_points(model, arg):
@@ -164,7 +177,7 @@ def lin_freq_points(model, arg):
     }
 
     commands = {
-        Model.HP_8753D: 'POIN %d' % arg,
+        Model.HP_8753D: 'POIN {}'.format(arg),
     }
     if argument_valid.get(model):
         return commands.get(model)
@@ -185,7 +198,7 @@ def avg_factor(model, arg):
     }
 
     commands = {
-        Model.HP_8753D: 'AVERFACT %d' % arg,
+        Model.HP_8753D: 'AVERFACT {}'.format(arg),
     }
     if argument_valid.get(model):
         return commands.get(model)
@@ -213,7 +226,7 @@ def if_bw(model, arg):
     }
 
     commands = {
-        Model.HP_8753D: 'IFBW %d HZ' % arg,
+        Model.HP_8753D: 'IFBW {} HZ'.format(arg),
     }
     if argument_valid.get(model):
         return commands.get(model)
@@ -308,5 +321,12 @@ def cal_s11_1_port_load(model):
 def save_1_port_cal(model):
     commands = {
         Model.HP_8753D: 'SAV1',
+    }
+    return commands.get(model)
+
+
+def correction_on(model):
+    commands = {
+        Model.HP_8753D: 'CORRON',
     }
     return commands.get(model)
