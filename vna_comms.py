@@ -37,8 +37,7 @@ class session:
         return 0
 
     def reset(self):  # resets only measurement parameters changed in setup (do not wipe calibration data!)
-        if isinstance(self.freq, list):
-            self.vna.write(find_command(self.model, Action.CLEAR_LIST))
+        self.vna.write(find_command(self.model, Action.CLEAR_LIST))
 
     def setup(self, freq, avg, bw):
         self.freq = freq
