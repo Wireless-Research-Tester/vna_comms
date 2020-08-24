@@ -1,4 +1,8 @@
 # Changelog
+### v1.2.3
+
+- Minor fix to vna_comms reset() after testing in meas_ctrl
+
 ### v1.2.2
 
 - Fixed an issue where dB conversion will return a math domain error
