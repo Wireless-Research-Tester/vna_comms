@@ -1,4 +1,9 @@
 # Changelog
+### v1.2.4
+
+- added better commenting on code
+- renamed some syntax fuctions to better represent the performed actions
+
 ### v1.2.3
 
 - Minor fix to vna_comms reset() after testing in meas_ctrl

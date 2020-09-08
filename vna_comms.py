@@ -37,6 +37,7 @@ class session:
         return 0
 
     def reset(self):  # resets only measurement parameters changed in setup (do not wipe calibration data!)
+        self.vna.write(find_command(self.model, Action.EDIT_LIST))
         self.vna.write(find_command(self.model, Action.CLEAR_LIST))
 
     def setup(self, freq, avg, bw):
@@ -47,6 +48,7 @@ class session:
                 raise Exception('The number of frequencies in the frequency list exceeded 30.')
             for i in range(0, len(self.freq)):
                 freq_temp = self.freq[i]
+                self.vna.write(find_command(self.model, Action.EDIT_LIST))
                 self.vna.write(find_command(self.model, Action.ADD_LIST_FREQ, int(freq_temp * 1000)))
             self.vna.write(find_command(self.model, Action.LIST_FREQ_MODE))
         else:
@@ -66,11 +68,11 @@ class session:
     def get_data(self, theta, phi, data_type):
         temp_data_set = []
 
+        self.vna.write(find_command(self.model, Action.DISPLAY_DATA_AND_MEM))
         self.vna.write(find_command(self.model, Action.POLAR))
         self.vna.write(find_command(self.model, Action.POLAR_LOG_MARKER))
         self.vna.write(find_command(self.model, Action.AUTO_SCALE))
         self.vna.write(find_command(self.model, Action.DATA_TO_MEM))
-        self.vna.write(find_command(self.model, Action.DISPLAY_MEM))
         self.vna.write(find_command(self.model, Action.OUTPUT_FORMATTED_DATA))
         if isinstance(self.freq, list):
             for i in range(0, len(self.freq)):
