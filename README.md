@@ -1,4 +1,8 @@
 # Changelog
+### v1.2.5
+
+- changed data trasnfer from form 4 (ASCII characters) to form 2 (32 bit float), sped up execution by a bit
+
 ### v1.2.4
 
 - added better commenting on code
