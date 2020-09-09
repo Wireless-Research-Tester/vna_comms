@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 class Action(Enum):
     RESET = auto()
-    FORM4 = auto()
+    FORM2 = auto()
     EDIT_LIST = auto()
     ADD_LIST_FREQ = auto()
     LIST_FREQ_MODE = auto()
@@ -46,8 +46,8 @@ def check_model(string):
 def find_command(model, action, arg=0):
     if action == Action.RESET:
         return reset(model)
-    elif action == Action.FORM4:
-        return form4(model)
+    elif action == Action.FORM2:
+        return form2(model)
     elif action == Action.EDIT_LIST:
         return edit_list(model)
     elif action == Action.ADD_LIST_FREQ:
@@ -113,9 +113,9 @@ def reset(model):
 
 
 # this action should set the array data from the VNA to be transferred in ASCII floating point format
-def form4(model):
+def form2(model):
     commands = {
-        Model.HP_8753D: 'FORM4',
+        Model.HP_8753D: 'FORM2',
     }
     return commands.get(model)
 
@@ -230,7 +230,7 @@ def avg_factor(model, arg):
         raise Exception('The averaging factor is invalid: {}'.format(arg))
 
 
-# this action should turn on averaging
+# this action should turn ON averaging.
 def avg_on(model):
     commands = {
         Model.HP_8753D: 'AVERO1',
