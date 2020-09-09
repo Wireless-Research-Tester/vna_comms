@@ -1,5 +1,6 @@
 import pyvisa as visa
 import math
+from struct import unpack
 from syntaxes import find_command, Action, check_model
 
 
@@ -27,7 +28,7 @@ class session:
         self.vna.read_termination = '\n'
         del self.vna.timeout
         self.model = check_model(self.vna.query('*IDN?'))
-        self.vna.write(find_command(self.model, Action.FORM4))
+        self.vna.write(find_command(self.model, Action.FORM2))
         self.freq = None
         self.using_correction = False
 
@@ -67,6 +68,8 @@ class session:
 
     def get_data(self, theta, phi, data_type):
         temp_data_set = []
+        output_real = []
+        output_imag = []
 
         self.vna.write(find_command(self.model, Action.DISPLAY_DATA_AND_MEM))
         self.vna.write(find_command(self.model, Action.POLAR))
@@ -74,13 +77,30 @@ class session:
         self.vna.write(find_command(self.model, Action.AUTO_SCALE))
         self.vna.write(find_command(self.model, Action.DATA_TO_MEM))
         self.vna.write(find_command(self.model, Action.OUTPUT_FORMATTED_DATA))
+
         if isinstance(self.freq, list):
-            for i in range(0, len(self.freq)):
-                rectangular_temp = self.vna.read_ascii_values()
-                mag_temp = 20 * math.log(
-                    math.sqrt(rectangular_temp[0] * rectangular_temp[0] + rectangular_temp[1] * rectangular_temp[1]) +
-                    1e-60, 10)
-                phase_temp = phase(rectangular_temp)
+            output = self.vna.read_bytes(4 + 8 * len(self.freq))
+            x = 0
+            while x < 2 * len(self.freq):
+                output_real.append(unpack('>f', output[4 * (x + 1):4 * (x + 2)])[0])
+                x = x + 1
+                output_imag.append(unpack('>f', output[4 * (x + 1):4 * (x + 2)])[0])
+                x = x + 1
+        else:
+            output = self.vna.read_bytes(4 + 8 * self.freq.points)
+            x = 0
+            while x < 2 * self.freq.points:
+                output_real.append(unpack('>f', output[4 * (x + 1):4 * (x + 2)])[0])
+                x = x + 1
+                output_imag.append(unpack('>f', output[4 * (x + 1):4 * (x + 2)])[0])
+                x = x + 1
+
+        if isinstance(self.freq, list):
+            length = len(self.freq)
+            for i in range(0, length):
+                rect_temp = [output_real[i], output_imag[i]]
+                mag_temp = 20 * math.log(math.sqrt(rect_temp[0]*rect_temp[0] + rect_temp[1]*rect_temp[1]) + 1e-60, 10)
+                phase_temp = phase(rect_temp)
                 if data_type == 'S21':
                     temp_data_set.append(data('S21', self.freq[i], theta, phi, mag_temp, phase_temp))
                 else:
@@ -89,11 +109,9 @@ class session:
             span = self.freq.end - self.freq.start
             for i in range(0, self.freq.points):
                 freq = self.freq.start + i * span / (self.freq.points - 1)
-                rectangular_temp = self.vna.read_ascii_values()
-                mag_temp = 20 * math.log(
-                    math.sqrt(rectangular_temp[0] * rectangular_temp[0] + rectangular_temp[1] * rectangular_temp[1]) +
-                    1e-60, 10)
-                phase_temp = phase(rectangular_temp)
+                rect_temp = [output_real[i], output_imag[i]]
+                mag_temp = 20 * math.log(math.sqrt(rect_temp[0]*rect_temp[0] + rect_temp[1]*rect_temp[1]) + 1e-60, 10)
+                phase_temp = phase(rect_temp)
                 if data_type == 'S21':
                     temp_data_set.append(data('S21', freq, theta, phi, mag_temp, phase_temp))
                 else:
@@ -112,7 +130,7 @@ class session:
         print('Calibration is complete!')
         self.using_correction = True
 
-    def rst_avg(self, data_type):   # the S11 and S21 commands automatically trigger an averaging reset in the VNA
+    def rst_avg(self, data_type):  # the S11 and S21 commands automatically trigger an averaging reset in the VNA
         if data_type == 'S11':
             self.vna.write(find_command(self.model, Action.S11))
         elif data_type == 'S21':
